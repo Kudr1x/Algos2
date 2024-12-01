@@ -97,7 +97,7 @@ func height(node *bstNode) int {
 	return rightHeight + 1
 }
 
-func (bst *BSTree) Print() {
+func (bst *BSTree) InOrderTraversal() {
 	inOrderTraversal(bst.root)
 }
 
@@ -107,4 +107,30 @@ func inOrderTraversal(node *bstNode) {
 		fmt.Print(node.key, " ")
 		inOrderTraversal(node.right)
 	}
+}
+
+func (bst *BSTree) LevelOrderTraversal() {
+	if bst.root == nil {
+		return
+	}
+
+	queue := []*bstNode{bst.root}
+
+	for len(queue) > 0 {
+		currentNode := queue[0]
+
+		queue = queue[1:]
+
+		fmt.Print(currentNode.key, " ")
+
+		if currentNode.left != nil {
+			queue = append(queue, currentNode.left)
+		}
+
+		if currentNode.right != nil {
+			queue = append(queue, currentNode.right)
+		}
+	}
+
+	fmt.Println()
 }

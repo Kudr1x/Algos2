@@ -174,7 +174,7 @@ func minValueNode(node *avlNode) *avlNode {
 	return current
 }
 
-func (tree *AVLTree) Print() {
+func (tree *AVLTree) InOrderTraversal() {
 	tree.inOrderTraversal(tree.root)
 }
 

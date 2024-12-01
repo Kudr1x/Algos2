@@ -1,9 +1,11 @@
 package main
 
 import (
-	"Algos2/src/plot"
+	"Algos2/src/plot/practice"
+	"Algos2/src/plot/theory"
 )
 
 func main() {
-	plot.DrawPlots()
+	practice.DrawPractice()
+	theory.DrawTheory()
 }

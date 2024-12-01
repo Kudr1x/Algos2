@@ -1,7 +1,8 @@
-package plot
+package practice
 
 import (
 	"Algos2/src/trees"
+	"Algos2/src/util"
 	"fmt"
 	"math/rand"
 	"os/exec"
@@ -10,17 +11,29 @@ import (
 	"strings"
 )
 
-func DrawPlots() {
+func DrawPractice() {
+	util.Clear("practiceData")
 	drawAvlTree()
 	drawRbTree()
 	drawBsTree()
+	drawGeneralPlot()
+}
+
+func drawGeneralPlot() {
+	cmd := exec.Command("python", "/home/kudrix/GolandProjects/Algos2/src/plot/practice/drawGeneralPlotPractice.py")
+
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		text := string(out)
+		fmt.Println(text)
+	}
 }
 
 func drawAvlTree() {
 	rand.Seed(51)
 	var data string
 
-	for n := 10; n <= 1000000; n *= 10 {
+	for _, n := range util.ArrN {
 		var arrXY []string
 		tree := trees.AVLTree{}
 		keys := rand.Perm(n)
@@ -39,9 +52,14 @@ func drawAvlTree() {
 
 	data = data[:len(data)-1]
 
-	cmd := exec.Command("python", "/home/kudrix/GolandProjects/Algos2/src/plot/draw.py", data, "AVL Дерево")
+	util.Write(data, "practiceData")
+
+	cmd := exec.Command("python", "/home/kudrix/GolandProjects/Algos2/src/plot/practice/drawSinglePlotPractice.py", data, "AVL Дерево")
 
 	out, err := cmd.CombinedOutput()
+
+	util.WriteCSV("AVLTree", string(out))
+
 	if err != nil {
 		text := string(out)
 		fmt.Println(text)
@@ -52,7 +70,7 @@ func drawBsTree() {
 	rand.Seed(51)
 	var data string
 
-	for n := 10; n <= 1000000; n *= 10 {
+	for _, n := range util.ArrN {
 		var arrXY []string
 		tree := trees.BSTree{}
 		keys := rand.Perm(n)
@@ -70,9 +88,14 @@ func drawBsTree() {
 
 	data = data[:len(data)-1]
 
-	cmd := exec.Command("python", "/home/kudrix/GolandProjects/Algos2/src/plot/draw.py", data, "BS Дерево")
+	util.Write(data, "practiceData")
+
+	cmd := exec.Command("python", "/home/kudrix/GolandProjects/Algos2/src/plot/practice/drawSinglePlotPractice.py", data, "BS Дерево")
 
 	out, err := cmd.CombinedOutput()
+
+	util.WriteCSV("BSTree", string(out))
+
 	if err != nil {
 		text := string(out)
 		fmt.Println(text)
@@ -83,7 +106,7 @@ func drawRbTree() {
 	rand.Seed(51)
 	var data string
 
-	for n := 10; n <= 1000000; n *= 10 {
+	for _, n := range util.ArrN {
 		var arrXY []string
 		tree := trees.RBTree{}
 		keys := rand.Perm(n)
@@ -102,9 +125,14 @@ func drawRbTree() {
 
 	data = data[:len(data)-1]
 
-	cmd := exec.Command("python", "/home/kudrix/GolandProjects/Algos2/src/plot/draw.py", data, "RB Дерево")
+	util.Write(data, "practiceData")
+
+	cmd := exec.Command("python", "/home/kudrix/GolandProjects/Algos2/src/plot/practice/drawSinglePlotPractice.py", data, "RB Дерево")
 
 	out, err := cmd.CombinedOutput()
+
+	util.WriteCSV("RBTree", string(out))
+
 	if err != nil {
 		text := string(out)
 		fmt.Println(text)

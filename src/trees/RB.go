@@ -140,7 +140,7 @@ func (tree *RBTree) inOrderTraversal(node *rbtNode) {
 	}
 }
 
-func (tree *RBTree) Print() {
+func (tree *RBTree) InOrderTraversal() {
 	tree.inOrderTraversal(tree.root)
 }
 
@@ -170,4 +170,127 @@ func (tree *RBTree) height(node *rbtNode) int {
 		return leftHeight + 1
 	}
 	return rightHeight + 1
+}
+
+func (tree *RBTree) Delete(key int) {
+	nodeToDelete := tree.Search(key)
+	if nodeToDelete == nil {
+		fmt.Println("Node not found")
+		return
+	}
+	tree.deleteNode(nodeToDelete)
+}
+
+func (tree *RBTree) deleteNode(z *rbtNode) {
+	y := z
+	yOriginalColor := y.color
+	var x *rbtNode
+
+	if z.left == nil {
+		x = z.right
+		tree.transplant(z, z.right)
+	} else if z.right == nil {
+		x = z.left
+		tree.transplant(z, z.left)
+	} else {
+		y = tree.minimum(z.right)
+		yOriginalColor = y.color
+		x = y.right
+		if y.parent == z {
+			x.parent = y
+		} else {
+			tree.transplant(y, y.right)
+			y.right = z.right
+			y.right.parent = y
+		}
+		tree.transplant(z, y)
+		y.left = z.left
+		y.left.parent = y
+		y.color = z.color
+	}
+
+	if yOriginalColor == BLACK {
+		tree.fixDelete(x)
+	}
+}
+
+func (tree *RBTree) transplant(u, v *rbtNode) {
+	if u.parent == nil {
+		tree.root = v
+	} else if u == u.parent.left {
+		u.parent.left = v
+	} else {
+		u.parent.right = v
+	}
+	if v != nil {
+		v.parent = u.parent
+	}
+}
+
+func (tree *RBTree) minimum(node *rbtNode) *rbtNode {
+	for node.left != nil {
+		node = node.left
+	}
+	return node
+}
+
+func (tree *RBTree) fixDelete(x *rbtNode) {
+	for x != tree.root && (x == nil || x.color == BLACK) {
+		if x == x.parent.left {
+			w := x.parent.right
+			if w.color == RED {
+				w.color = BLACK
+				x.parent.color = RED
+				tree.rotateLeft(x.parent)
+				w = x.parent.right
+			}
+			if (w.left == nil || w.left.color == BLACK) && (w.right == nil || w.right.color == BLACK) {
+				w.color = RED
+				x = x.parent
+			} else {
+				if w.right == nil || w.right.color == BLACK {
+					w.left.color = BLACK
+					w.color = RED
+					tree.rotateRight(w)
+					w = x.parent.right
+				}
+				w.color = x.parent.color
+				x.parent.color = BLACK
+				if w.right != nil {
+					w.right.color = BLACK
+				}
+				tree.rotateLeft(x.parent)
+				x = tree.root
+			}
+		} else {
+			w := x.parent.left
+			if w.color == RED {
+				w.color = BLACK
+				x.parent.color = RED
+				tree.rotateRight(x.parent)
+				w = x.parent.left
+			}
+			if (w.left == nil || w.left.color == BLACK) && (w.right == nil || w.right.color == BLACK) {
+				w.color = RED
+				x = x.parent
+			} else {
+				if w.left == nil || w.left.color == BLACK {
+					w.right.color = BLACK
+					w.color = RED
+					tree.rotateLeft(w)
+					w = x.parent.left
+				}
+				w.color = x.parent.color
+				x.parent.color = BLACK
+				if w.left != nil {
+					w.left.color = BLACK
+				}
+				tree.rotateRight(x.parent)
+				x = tree.root
+			}
+		}
+	}
+	if x != nil {
+		x.color = BLACK
+	}
 }
