@@ -75,9 +75,7 @@ func drawBsTree() {
 		tree := trees.BSTree{}
 		keys := rand.Perm(n)
 
-		for _, key := range keys {
-			tree.Insert(key)
-		}
+		tree.FillBalanced(keys)
 
 		arrXY = append(arrXY, strconv.Itoa(n))
 		arrXY = append(arrXY, strconv.Itoa(tree.Height()))

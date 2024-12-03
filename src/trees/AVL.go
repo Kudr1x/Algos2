@@ -2,6 +2,7 @@ package trees
 
 import (
 	"Algos2/src/util"
+	"container/list"
 	"fmt"
 )
 
@@ -181,11 +182,79 @@ func (tree *AVLTree) InOrderTraversal() {
 func (tree *AVLTree) inOrderTraversal(node *avlNode) {
 	if node != nil {
 		tree.inOrderTraversal(node.left)
-		fmt.Printf("%d", node.key)
+		fmt.Printf("%d ", node.key)
 		tree.inOrderTraversal(node.right)
 	}
 }
 
 func (tree *AVLTree) Height() int {
 	return tree.root.GetHeight()
+}
+
+func (tree *AVLTree) LevelOrderTraversal() {
+	if tree.root == nil {
+		return
+	}
+
+	queue := list.New()
+
+	queue.PushBack(tree.root)
+
+	for queue.Len() > 0 {
+		node := queue.Remove(queue.Front()).(*avlNode)
+
+		fmt.Printf("%d ", node.key)
+
+		if node.left != nil {
+			queue.PushBack(node.left)
+		}
+
+		if node.right != nil {
+			queue.PushBack(node.right)
+		}
+	}
+}
+
+func (tree *AVLTree) PostLevelOrderTraversal() {
+	if tree.root == nil {
+		return
+	}
+
+	queue := list.New()
+
+	stack := list.New()
+
+	queue.PushBack(tree.root)
+
+	for queue.Len() > 0 {
+
+		node := queue.Remove(queue.Front()).(*avlNode)
+
+		stack.PushBack(node)
+
+		if node.right != nil {
+			queue.PushBack(node.right)
+		}
+
+		if node.left != nil {
+			queue.PushBack(node.left)
+		}
+	}
+
+	for stack.Len() > 0 {
+		node := stack.Remove(stack.Back()).(*avlNode)
+		fmt.Printf("%d ", node.key)
+	}
+}
+
+func (tree *AVLTree) PreOrderTraversal() {
+	tree.preOrderTraversal(tree.root)
+}
+
+func (tree *AVLTree) preOrderTraversal(node *avlNode) {
+	if node != nil {
+		fmt.Printf("%d ", node.key)        // Обработка корня
+		tree.preOrderTraversal(node.left)  // Обход левого поддерева
+		tree.preOrderTraversal(node.right) // Обход правого поддерева
+	}
 }

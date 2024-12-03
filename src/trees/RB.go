@@ -23,111 +23,6 @@ func NewNode(key int) *rbtNode {
 	return &rbtNode{color: RED, key: key, left: nil, right: nil, parent: nil}
 }
 
-func (tree *RBTree) Insert(key int) {
-	newNode := NewNode(key)
-	if tree.root == nil {
-		tree.root = newNode
-		tree.root.color = BLACK
-		return
-	}
-
-	tree.insertNode(tree.root, newNode)
-	tree.fixInsert(newNode)
-}
-
-func (tree *RBTree) insertNode(root, newNode *rbtNode) {
-	if newNode.key < root.key {
-		if root.left == nil {
-			root.left = newNode
-			newNode.parent = root
-		} else {
-			tree.insertNode(root.left, newNode)
-		}
-	} else {
-		if root.right == nil {
-			root.right = newNode
-			newNode.parent = root
-		} else {
-			tree.insertNode(root.right, newNode)
-		}
-	}
-}
-
-func (tree *RBTree) fixInsert(newNode *rbtNode) {
-	for newNode != tree.root && newNode.parent.color == RED {
-		if newNode.parent == newNode.parent.parent.left {
-			uncle := newNode.parent.parent.right
-			if uncle != nil && uncle.color == RED {
-				newNode.parent.color = BLACK
-				uncle.color = BLACK
-				newNode.parent.parent.color = RED
-				newNode = newNode.parent.parent
-			} else {
-				if newNode == newNode.parent.right {
-					newNode = newNode.parent
-					tree.rotateLeft(newNode)
-				}
-				newNode.parent.color = BLACK
-				newNode.parent.parent.color = RED
-				tree.rotateRight(newNode.parent.parent)
-			}
-		} else {
-			uncle := newNode.parent.parent.left
-			if uncle != nil && uncle.color == RED {
-				newNode.parent.color = BLACK
-				uncle.color = BLACK
-				newNode.parent.parent.color = RED
-				newNode = newNode.parent.parent
-			} else {
-				if newNode == newNode.parent.left {
-					newNode = newNode.parent
-					tree.rotateRight(newNode)
-				}
-				newNode.parent.color = BLACK
-				newNode.parent.parent.color = RED
-				tree.rotateLeft(newNode.parent.parent)
-			}
-		}
-	}
-	tree.root.color = BLACK
-}
-
-func (tree *RBTree) rotateLeft(x *rbtNode) {
-	y := x.right
-	x.right = y.left
-	if y.left != nil {
-		y.left.parent = x
-	}
-	y.parent = x.parent
-	if x.parent == nil {
-		tree.root = y
-	} else if x == x.parent.left {
-		x.parent.left = y
-	} else {
-		x.parent.right = y
-	}
-	y.left = x
-	x.parent = y
-}
-
-func (tree *RBTree) rotateRight(x *rbtNode) {
-	y := x.left
-	x.left = y.right
-	if y.right != nil {
-		y.right.parent = x
-	}
-	y.parent = x.parent
-	if x.parent == nil {
-		tree.root = y
-	} else if x == x.parent.right {
-		x.parent.right = y
-	} else {
-		x.parent.left = y
-	}
-	y.right = x
-	x.parent = y
-}
-
 func (tree *RBTree) Search(key int) *rbtNode {
 	return tree.searchNode(tree.root, key)
 }
@@ -172,13 +67,180 @@ func (tree *RBTree) height(node *rbtNode) int {
 	return rightHeight + 1
 }
 
-func (tree *RBTree) Delete(key int) {
-	nodeToDelete := tree.Search(key)
-	if nodeToDelete == nil {
-		fmt.Println("Node not found")
+func (tree *RBTree) transplant(u, v *rbtNode) {
+	if u.parent == nil {
+		tree.root = v
+	} else if u == u.parent.left {
+		u.parent.left = v
+	} else {
+		u.parent.right = v
+	}
+	if v != nil {
+		v.parent = u.parent
+	}
+}
+
+func (tree *RBTree) minimum(node *rbtNode) *rbtNode {
+	for node.left != nil {
+		node = node.left
+	}
+	return node
+}
+
+func (tree *RBTree) LevelOrderTraversal() {
+	if tree.root == nil {
 		return
 	}
-	tree.deleteNode(nodeToDelete)
+
+	queue := []*rbtNode{tree.root}
+
+	for len(queue) > 0 {
+		node := queue[0]
+		queue = queue[1:]
+
+		fmt.Printf("%d (%v) ", node.key, node.color)
+
+		if node.left != nil {
+			queue = append(queue, node.left)
+		}
+		if node.right != nil {
+			queue = append(queue, node.right)
+		}
+	}
+}
+
+func (tree *RBTree) PreOrderTraversal() {
+	tree.preOrderTraversal(tree.root)
+}
+
+func (tree *RBTree) preOrderTraversal(node *rbtNode) {
+	if node != nil {
+		fmt.Printf("%d (%v) ", node.key, node.color)
+		tree.preOrderTraversal(node.left)
+		tree.preOrderTraversal(node.right)
+	}
+}
+
+func (tree *RBTree) PostOrderTraversal() {
+	tree.postOrderTraversal(tree.root)
+}
+
+func (tree *RBTree) postOrderTraversal(node *rbtNode) {
+	if node != nil {
+		tree.postOrderTraversal(node.left)
+		tree.postOrderTraversal(node.right)
+		fmt.Printf("%d (%v) ", node.key, node.color)
+	}
+}
+
+func (tree *RBTree) Insert(key int) {
+	newNode := NewNode(key)
+	tree.root = tree.insertNode(tree.root, newNode)
+	tree.fixInsert(newNode)
+}
+
+func (tree *RBTree) insertNode(root, newNode *rbtNode) *rbtNode {
+	if root == nil {
+		return newNode
+	}
+
+	if newNode.key < root.key {
+		root.left = tree.insertNode(root.left, newNode)
+		root.left.parent = root
+	} else {
+		root.right = tree.insertNode(root.right, newNode)
+		root.right.parent = root
+	}
+
+	return root
+}
+
+func (tree *RBTree) fixInsert(node *rbtNode) {
+	for node.parent != nil && node.parent.color == RED {
+		if node.parent == node.parent.parent.left {
+			uncle := node.parent.parent.right
+			if uncle != nil && uncle.color == RED {
+				// Case 1: Uncle is red
+				node.parent.color = BLACK
+				uncle.color = BLACK
+				node.parent.parent.color = RED
+				node = node.parent.parent
+			} else {
+				if node == node.parent.right {
+					// Case 2: Node is right child
+					node = node.parent
+					tree.leftRotate(node)
+				}
+				// Case 3: Node is left child
+				node.parent.color = BLACK
+				node.parent.parent.color = RED
+				tree.rightRotate(node.parent.parent)
+			}
+		} else {
+			uncle := node.parent.parent.left
+			if uncle != nil && uncle.color == RED {
+				// Case 1: Uncle is red
+				node.parent.color = BLACK
+				uncle.color = BLACK
+				node.parent.parent.color = RED
+				node = node.parent.parent
+			} else {
+				if node == node.parent.left {
+					// Case 2: Node is left child
+					node = node.parent
+					tree.rightRotate(node)
+				}
+				// Case 3: Node is right child
+				node.parent.color = BLACK
+				node.parent.parent.color = RED
+				tree.leftRotate(node.parent.parent)
+			}
+		}
+	}
+	tree.root.color = BLACK
+}
+
+func (tree *RBTree) leftRotate(x *rbtNode) {
+	y := x.right
+	x.right = y.left
+	if y.left != nil {
+		y.left.parent = x
+	}
+	y.parent = x.parent
+	if x.parent == nil {
+		tree.root = y
+	} else if x == x.parent.left {
+		x.parent.left = y
+	} else {
+		x.parent.right = y
+	}
+	y.left = x
+	x.parent = y
+}
+
+func (tree *RBTree) rightRotate(y *rbtNode) {
+	x := y.left
+	y.left = x.right
+	if x.right != nil {
+		x.right.parent = y
+	}
+	x.parent = y.parent
+	if y.parent == nil {
+		tree.root = x
+	} else if y == y.parent.right {
+		y.parent.right = x
+	} else {
+		y.parent.left = x
+	}
+	x.right = y
+	y.parent = x
+}
+
+func (tree *RBTree) Delete(key int) {
+	node := tree.Search(key)
+	if node != nil {
+		tree.deleteNode(node)
+	}
 }
 
 func (tree *RBTree) deleteNode(z *rbtNode) {
@@ -214,78 +276,68 @@ func (tree *RBTree) deleteNode(z *rbtNode) {
 	}
 }
 
-func (tree *RBTree) transplant(u, v *rbtNode) {
-	if u.parent == nil {
-		tree.root = v
-	} else if u == u.parent.left {
-		u.parent.left = v
-	} else {
-		u.parent.right = v
-	}
-	if v != nil {
-		v.parent = u.parent
-	}
-}
-
-func (tree *RBTree) minimum(node *rbtNode) *rbtNode {
-	for node.left != nil {
-		node = node.left
-	}
-	return node
-}
-
 func (tree *RBTree) fixDelete(x *rbtNode) {
 	for x != tree.root && (x == nil || x.color == BLACK) {
+		if x == nil {
+			break
+		}
 		if x == x.parent.left {
 			w := x.parent.right
-			if w.color == RED {
+			if w != nil && w.color == RED {
 				w.color = BLACK
 				x.parent.color = RED
-				tree.rotateLeft(x.parent)
+				tree.leftRotate(x.parent)
 				w = x.parent.right
 			}
-			if (w.left == nil || w.left.color == BLACK) && (w.right == nil || w.right.color == BLACK) {
-				w.color = RED
+			if w == nil || (w.left == nil || w.left.color == BLACK) && (w.right == nil || w.right.color == BLACK) {
+				if w != nil {
+					w.color = RED
+				}
 				x = x.parent
 			} else {
 				if w.right == nil || w.right.color == BLACK {
-					w.left.color = BLACK
-					w.color = RED
-					tree.rotateRight(w)
+					if w.left != nil {
+						w.left.color = BLACK
+					}
+					tree.rightRotate(w)
 					w = x.parent.right
 				}
-				w.color = x.parent.color
+				if w != nil {
+					w.color = x.parent.color
+				}
 				x.parent.color = BLACK
-				if w.right != nil {
+				if w != nil && w.right != nil {
 					w.right.color = BLACK
 				}
-				tree.rotateLeft(x.parent)
+				tree.leftRotate(x.parent)
 				x = tree.root
 			}
 		} else {
 			w := x.parent.left
-			if w.color == RED {
+			if w != nil && w.color == RED {
 				w.color = BLACK
 				x.parent.color = RED
-				tree.rotateRight(x.parent)
+				tree.rightRotate(x.parent)
 				w = x.parent.left
 			}
-			if (w.left == nil || w.left.color == BLACK) && (w.right == nil || w.right.color == BLACK) {
-				w.color = RED
+			if w == nil || (w.right == nil || w.right.color == BLACK) && (w.left == nil || w.left.color == BLACK) {
+				if w != nil {
+					w.color = RED
+				}
 				x = x.parent
 			} else {
 				if w.left == nil || w.left.color == BLACK {
-					w.right.color = BLACK
-					w.color = RED
-					tree.rotateLeft(w)
+					tree.leftRotate(w)
 					w = x.parent.left
 				}
-				w.color = x.parent.color
+				if w != nil {
+					w.color = x.parent.color
+				}
 				x.parent.color = BLACK
-				if w.left != nil {
+				if w != nil && w.left != nil {
 					w.left.color = BLACK
 				}
-				tree.rotateRight(x.parent)
+				tree.rightRotate(x.parent)
 				x = tree.root
 			}
 		}

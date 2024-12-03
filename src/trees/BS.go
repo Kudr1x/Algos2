@@ -2,6 +2,7 @@ package trees
 
 import (
 	"fmt"
+	"sort"
 )
 
 type bstNode struct {
@@ -131,6 +132,47 @@ func (bst *BSTree) LevelOrderTraversal() {
 			queue = append(queue, currentNode.right)
 		}
 	}
+}
 
-	fmt.Println()
+func (bst *BSTree) PreOrderTraversal() {
+	preOrderTraversal(bst.root)
+}
+
+func preOrderTraversal(node *bstNode) {
+	if node != nil {
+		fmt.Print(node.key, " ")
+		preOrderTraversal(node.left)
+		preOrderTraversal(node.right)
+	}
+}
+
+func (bst *BSTree) PostOrderTraversal() {
+	postOrderTraversal(bst.root)
+}
+
+func postOrderTraversal(node *bstNode) {
+	if node != nil {
+		postOrderTraversal(node.left)
+		postOrderTraversal(node.right)
+		fmt.Print(node.key, " ")
+	}
+}
+
+func (bst *BSTree) FillBalanced(keys []int) {
+	sort.Ints(keys)
+	bst.root = fillBalanced(keys, 0, len(keys)-1)
+}
+
+func fillBalanced(keys []int, start, end int) *bstNode {
+	if start > end {
+		return nil
+	}
+
+	mid := (start + end) / 2
+	node := &bstNode{key: keys[mid]}
+
+	node.left = fillBalanced(keys, start, mid-1)
+	node.right = fillBalanced(keys, mid+1, end)
+
+	return node
 }
