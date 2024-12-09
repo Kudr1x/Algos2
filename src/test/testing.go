@@ -30,7 +30,7 @@ func Avl() {
 }
 
 func Bs() {
-	fmt.Println("\n\nBS - Дерево")
+	fmt.Println("\n\nBs - Дерево")
 	tree := &trees.BSTree{}
 
 	tree.Insert(10)
@@ -54,7 +54,7 @@ func Bs() {
 }
 
 func Rb() {
-	fmt.Println("\n\nBs - Дерево")
+	fmt.Println("\n\nRb - Дерево")
 	tree := &trees.RBTree{}
 
 	tree.Insert(10)

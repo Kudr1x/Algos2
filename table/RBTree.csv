@@ -1,4 +1,31 @@
 "2.84245358034825 -2.157142033505244
 "
-"2.84245358034825 -2.157142033505244
+ile ""/home/kudrix/GolandProjects/Algos2/src/plot/drawGraphics.py"""," line 18"," in <module>
+    arrXInt.append(int(arr[0]))
+                   ^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: ''
+"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/kudrix/GolandProjects/Algos2/raw/10",5;100,11;200,13;500,15;1000,17;2000,19;5000,22;10000,24;20000,26;30000,27;40000,28;50000,29;100000,"31Data.txt'
+"
+re.py"""," line 3395"," in savefig
+    self.canvas.print_figure(fname"," **kwargs)
+  File ""/home/kudrix/.local/lib/python3.12/site-packages/matplotlib/backend_bases.py"""," line 2204"," in print_figure
+    result = print_method(
+             ^^^^^^^^^^^^^
+  File ""/home/kudrix/.local/lib/python3.12/site-packages/matplotlib/backend_bases.py"""," line 2054"," in <lambda>
+    print_method = functools.wraps(meth)(lambda *args"," **kwargs: meth(
+                                                                 ^^^^^
+  File ""/home/kudrix/.local/lib/python3.12/site-packages/matplotlib/backends/backend_agg.py"""," line 496"," in print_png
+    self._print_pil(filename_or_obj"," ""png"""," pil_kwargs"," metadata)
+  File ""/home/kudrix/.local/lib/python3.12/site-packages/matplotlib/backends/backend_agg.py"""," line 445"," in _print_pil
+    mpl.image.imsave(
+  File ""/home/kudrix/.local/lib/python3.12/site-packages/matplotlib/image.py"""," line 1676"," in imsave
+    image.save(fname"," **pil_kwargs)
+  File ""/usr/lib64/python3.12/site-packages/PIL/Image.py"""," line 2456"," in save
+    fp = builtins.open(filename"," ""w+b"")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] Нет такого файла или каталога: '/home/kudrix/GolandProjects/Algos2/image/practice/RB Дерево.png'
+"
+eNotFoundError: [Errno 2] Нет такого файла или каталога: '/home/kudrix/GolandProjects/Algos2/image/practice/RB Дерево.png'
 "
